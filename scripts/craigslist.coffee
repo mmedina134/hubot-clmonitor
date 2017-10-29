@@ -1,6 +1,6 @@
-jsonfile   = require 'jsonfile'
-craigslist = require 'node-craigslist'
-config_path       = 'clmonitor-config.json'
+jsonfile    = require 'jsonfile'
+craigslist  = require 'node-craigslist'
+config_path = 'clmonitor-config.json'
 module.exports = (robot) ->
 
 
