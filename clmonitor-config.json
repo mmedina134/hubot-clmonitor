@@ -1,3 +1,6 @@
 {
-	"city":"Seattle"
+	"city":"LittleRock",
+	"searchTitlesOnly":"true",
+	"category": "Cars",
+	"search": "2015 Ford Mustang"
 }
