@@ -15,13 +15,14 @@ module.exports = (robot) ->
 			searchTitlesOnly:config.searchTitlesOnly
 			category: config.category
 			city : config.city
+			baseHost: config.baseHost
 			}
 		client = new craigslist.Client(config)
 		client
 			.search(options, config.search)
 			.then (listings) ->
 				listings.forEach (listing) -> 
-					console.error(listing)
+					console.log(listing)
 			.catch (err) ->
 				console.error(err)
 			
