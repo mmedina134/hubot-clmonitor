@@ -1,5 +1,6 @@
-#Developer: Miguel Medina
-
+#Author: Miguel Medina
+# Commands: 
+#   hubot search "enter item to search here"
 jsonfile    = require 'jsonfile'
 craigslist  = require 'node-craigslist'
 config_path = 'clmonitor-config.json'
@@ -9,17 +10,11 @@ module.exports = (robot) ->
 
 
 	#Testing craigslist api
-	robot.respond /test/, (res) ->
-		config = jsonfile.readFileSync(config_path)
-		options = {
-			searchTitlesOnly:config.searchTitlesOnly
-			category: config.category
-			city : config.city
-			baseHost: config.baseHost
-			}
-		client = new craigslist.Client(config)
+	robot.respond /search "(.*)"/, (msg) ->
+		options = jsonfile.readFileSync(config_path)
+		client = new craigslist.Client()
 		client
-			.search(options, config.search)
+			.search(options, msg.match[1])
 			.then (listings) ->
 				listings.forEach (listing) -> 
 					console.log(listing)
