@@ -4,8 +4,8 @@
 jsonfile    = require 'jsonfile'
 craigslist  = require 'node-craigslist'
 config_path = 'clmonitor-config.json'
-millisec= 300000/5 
-	
+millisec= 300000/10 
+
 module.exports = (robot) ->
 
 
@@ -15,12 +15,14 @@ module.exports = (robot) ->
 		setInterval ->
 			options = jsonfile.readFileSync(config_path)
 			client = new craigslist.Client()
-			client
-				.search(options, msg.match[1])
-				.then (listings) ->
-					listings.forEach (listing) -> 
-						console.log(listing)
-				.catch (err) ->
-					console.error(err)
+			
+			for option in options.items
+				client
+					.search(option, msg.match[1])
+					.then (listings) ->
+						listings.forEach (listing) -> 
+							msg.send(JSON.stringify listing)
+					.catch (err) ->
+						console.error(err)
 		, millisec
 	

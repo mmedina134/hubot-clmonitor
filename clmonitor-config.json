@@ -1,6 +1,10 @@
 {
-	"city":"LittleRock",
-	"searchTitlesOnly":"true",
-	"category": "Cars",
-	"baseHost": "craigslist.org"
+	"items":[
+		{
+			"city":"LittleRock",
+			"category": "cto",
+			"baseHost": "craigslist.org",
+			"searchNearby":"false"
+		}
+	]
 }
