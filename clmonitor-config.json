@@ -1,10 +1,13 @@
 {
-	"items":[
-		{
-			"city":"LittleRock",
+	"items": [{
+			"search": "2015 mustang",
+			"city": "LittleRock",
 			"category": "cto",
 			"baseHost": "craigslist.org",
-			"searchNearby":"false"
+			"searchNearby": "false"
+		}, {
+			"search": "2016 toyota",
+			"city": "houston"
 		}
 	]
 }
