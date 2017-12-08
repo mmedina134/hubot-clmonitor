@@ -5,9 +5,6 @@
 			"category": "cto",
 			"baseHost": "craigslist.org",
 			"searchNearby": "false"
-		}, {
-			"search": "2016 toyota",
-			"city": "houston"
 		}
 	]
 }

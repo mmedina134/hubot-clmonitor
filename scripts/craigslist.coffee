@@ -13,21 +13,19 @@ Conversation = require 'hubot-conversation'
 module.exports = (robot) ->
 
 	switchBoard = new Conversation(robot)
-	#Search for item every so often
+	
 	robot.respond /add "(.*)" to search/i, (msg) ->
-		searchVal = msg.match[1]
+		searchCriteria = {}
+		searchCriteria.search = msg.match[1]
 		dialog    = switchBoard.startDialog(msg)
 		msg.reply 'What city would you like to search?'
 		dialog.addChoice /(.+)/i, (msg2) -> 
-			city = msg2.match[1]
-			searchCriteria = {
-				search:searchVal
-				city:city
-				}
+			searchCriteria.city = msg2.match[1]
 			options = jsonfile.readFileSync(config_path)
 			options.items.push searchCriteria
 			jsonfile.writeFileSync config_path, options
 			
+	#Search for item every so often	
 	robot.respond /start searching/i, (msg) ->	
 		msg.send "checking every #{millisec/60000} minute(s)"
 		setInterval ->
