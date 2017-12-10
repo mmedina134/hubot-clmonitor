@@ -1,27 +1,29 @@
-# hubot-clmonitor
+# craigslistbot
 
 
 
-### Running hubot-clmonitor Locally
+### Running craigslistbot Locally
 
 You can test your hubot by running the following, however some plugins will not
 behave as expected unless the [environment variables](#configuration) they rely
 upon have been set.
 
-You can start hubot-clmonitor locally by running:
-
+You can start craigslistbot locally by running:
+	For Linux
     % bin/hubot
+	For Windows
+	  .\bin\hubot
 
 You'll see some start up output and a prompt:
 
     [Sat Feb 28 2015 12:38:27 GMT+0000 (GMT)] INFO Using default redis on localhost:6379
-    hubot-clmonitor>
+    craigslistbot>
 
-Then you can interact with hubot-clmonitor by typing `hubot-clmonitor help`.
+Then you can interact with craigslistbot by typing `craigslistbot help`.
 
-    hubot-clmonitor> hubot-clmonitor help
-    hubot-clmonitor animate me <query> - The same thing as `image me`, except adds [snip]
-    hubot-clmonitor help - Displays all of the help commands that hubot-clmonitor knows about.
+    craigslistbot> craigslistbot help
+    craigslistbot animate me <query> - The same thing as `image me`, except adds [snip]
+    craigslistbot help - Displays all of the help commands that hubot-clmonitor knows about.
     ...
 
 ### Configuration

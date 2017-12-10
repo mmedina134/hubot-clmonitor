@@ -3,8 +3,14 @@
 			"search": "2015 mustang",
 			"city": "LittleRock",
 			"category": "cto",
-			"baseHost": "craigslist.org",
-			"searchNearby": "false"
+			"searchNearby": "false",
+			"baseHost": "craigslist.org"
+		}, {
+			"search": "2013 toyota",
+			"city": "Chicago",
+			"category": "cto",
+			"searchNearby": "true",
+			"baseHost": "craigslist.org"
 		}
 	]
 }
