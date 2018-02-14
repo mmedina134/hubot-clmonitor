@@ -22,5 +22,9 @@
   },
   "engines": {
     "node": "0.10.x"
+  },
+  "devDependencies": {
+    "hubot-conversation": "^1.1.1",
+    "node-craigslist": "^1.2.2"
   }
 }

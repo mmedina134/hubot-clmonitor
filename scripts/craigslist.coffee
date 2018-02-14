@@ -1,19 +1,20 @@
-#Author: Miguel Medina
+# Author: Miguel Medina
 # Commands: 
 #   hubot add "enter item to search here" to search
 #	hubot start searching
 #   hubot reset search
 
-jsonfile    = require 'jsonfile'
-craigslist  = require 'node-craigslist'
-config_path = 'clmonitor-config.json'
-millisec    = 300000/10 
-Conversation = require 'hubot-conversation'
-
+jsonfile        = require 'jsonfile'
+craigslist      = require 'node-craigslist'
+config_path     = 'clmonitor-config.json'
+post_id_history = 'posting-id-history.json'
+millisec        = 300000/10 
+Conversation    = require 'hubot-conversation'
+pid_list        = []
 module.exports = (robot) ->
 
 	switchBoard = new Conversation(robot)
-	
+	#robot.enter(res) ->
 	#Add new item to monitor
 	robot.respond /add "(.*)" to search/i, (msg) ->
 		searchCriteria = {}
@@ -30,14 +31,14 @@ module.exports = (robot) ->
 				dialog.addChoice /(yes|no)/i, (msg4) ->
 					decision = msg4.match[1].toUpperCase()
 					console.log decision
-					isDecided = false
+					isDecided = false #'#
 					if decision == "YES" 
 						searchCriteria.searchNearby = "true"
 						isDecided = true
 					else if decision == "NO"
 						searchCriteria.searchNearby = "false"
-						isDecided = true
-					else
+						isDecided = true #'#
+					else 
 						msg4.reply 'please start over and reenter the initial command "add "item" to search"'
 						isDecided = false
 					if isDecided
@@ -45,9 +46,11 @@ module.exports = (robot) ->
 						dialog.addChoice /([^0]+)/i, (msg5) -> 
 							searchCriteria.baseHost = msg5.match[1]
 							addToSearchFile(searchCriteria)
+							msg5.reply "to start searching just type 'craiglistbot start searching' into the chat window"
 						dialog.addChoice /(0)/i, (msg5) ->
 							searchCriteria.baseHost = "craigslist.org"
 							addToSearchFile(searchCriteria)
+							msg5.reply "to start searching just type 'craiglistbot start searching' into the chat window"
 							
 	#Search for item every so often	
 	robot.respond /start searching/i, (msg) ->	
@@ -60,7 +63,11 @@ module.exports = (robot) ->
 					.search(option, option.search)
 					.then (listings) ->
 						listings.forEach (listing) -> 
-							msg.send(JSON.stringify listing)
+							pid_list = jsonfile.readFileSync(post_id_history)
+							if listing.pid not in pid_list
+								msg.send(JSON.stringify listing)
+								pid_list.push listing.pid
+								jsonfile.writeFileSync post_id_history, pid_list
 					.catch (err) ->
 						console.error(err)
 		, millisec

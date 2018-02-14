@@ -1,16 +1,1 @@
-{
-	"items": [{
-			"search": "2015 mustang",
-			"city": "LittleRock",
-			"category": "cto",
-			"searchNearby": "false",
-			"baseHost": "craigslist.org"
-		}, {
-			"search": "2013 toyota",
-			"city": "Chicago",
-			"category": "cto",
-			"searchNearby": "true",
-			"baseHost": "craigslist.org"
-		}
-	]
-}
+{"items":[{"search":"need help","city":"littlerock","category":"hsw","searchNearby":"false","baseHost":"craigslist.org"},{"search":"need help","city":"littlerock","category":"hsw","searchNearby":"false","baseHost":"craigslist.org"}]}
