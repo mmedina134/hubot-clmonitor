@@ -14,7 +14,14 @@ pid_list        = []
 module.exports = (robot) ->
 
 	switchBoard = new Conversation(robot)
-	#robot.enter(res) ->
+	robot.respond /test/i, (msg) ->
+		url = "https://" + process.env.HUBOT_FLOWDOCK_LOGIN_EMAIL + ":" + process.env.HUBOT_FLOWDOCK_LOGIN_PASSWORD + "@api.flowdock.com/flows/find?id=" + msg.message.user.room
+		robot.http(url)
+			.header('Accept', 'application/json')
+			.get() (err, res, body) ->
+				room_info = JSON.parse body
+				console.log room_info.name
+
 	#Add new item to monitor
 	robot.respond /add "(.*)" to search/i, (msg) ->
 		searchCriteria = {}
@@ -24,7 +31,7 @@ module.exports = (robot) ->
 		#dialog.addChoice /([^0]+)/i, (msg2) -> 
 		dialog.addChoice /(.+)/i, (msg2) -> 
 			searchCriteria.city = msg2.match[1]
-			msg2.reply 'Which category would you like to search?'
+			msg2.reply 'Which category would you like to search(examples, enter "cto" for cars and trucks sold by owner, or "hsw" for housing wanted )?'
 			dialog.addChoice /(.+)/i, (msg3) -> 
 				searchCriteria.category = msg3.match[1]
 				msg3.reply 'search nearby(enter yes or no)?'
@@ -45,11 +52,11 @@ module.exports = (robot) ->
 						msg4.reply 'What is the base host(enter 0 for default "craigslist.org" base host)?'
 						dialog.addChoice /([^0]+)/i, (msg5) -> 
 							searchCriteria.baseHost = msg5.match[1]
-							addToSearchFile(searchCriteria)
+							addToSearchFile(searchCriteria,msg5)
 							msg5.reply "to start searching just type 'craiglistbot start searching' into the chat window"
 						dialog.addChoice /(0)/i, (msg5) ->
 							searchCriteria.baseHost = "craigslist.org"
-							addToSearchFile(searchCriteria)
+							addToSearchFile(searchCriteria,msg5)
 							msg5.reply "to start searching just type 'craiglistbot start searching' into the chat window"
 							
 	#Search for item every so often	
@@ -58,27 +65,81 @@ module.exports = (robot) ->
 		setInterval ->
 			options = jsonfile.readFileSync(config_path)
 			client = new craigslist.Client()
-			for option in options.items
-				client
-					.search(option, option.search)
-					.then (listings) ->
-						listings.forEach (listing) -> 
-							pid_list = jsonfile.readFileSync(post_id_history)
-							if listing.pid not in pid_list
-								msg.send(JSON.stringify listing)
-								pid_list.push listing.pid
-								jsonfile.writeFileSync post_id_history, pid_list
-					.catch (err) ->
-						console.error(err)
+			url = "https://" + process.env.HUBOT_FLOWDOCK_LOGIN_EMAIL + ":" + process.env.HUBOT_FLOWDOCK_LOGIN_PASSWORD + "@api.flowdock.com/flows/find?id=" + msg.message.user.room
+			robot.http(url)
+				.header('Accept', 'application/json')
+				.get() (err, res, body) ->
+					room_info = JSON.parse body
+					room_name = room_info.name
+					for item in options.items
+						if item.room_name == room_name
+							for searchCriteria in item.searchCriterias
+								client
+									.search(searchCriteria, searchCriteria.search)
+									.then (listings) ->
+										listings.forEach (listing) -> 
+											pid_list = jsonfile.readFileSync(post_id_history)
+											room_is_in_pidlist = false
+											for pid_list_item in pid_list
+												if pid_list_item.room_name == room_name
+													if listing.pid not in pid_list_item.pids
+														msg.send(JSON.stringify listing)
+														pid_list_item.pids.push listing.pid
+														jsonfile.writeFileSync post_id_history, pid_list
+													room_is_in_pidlist = true
+														
+											if room_is_in_pidlist == false
+												msg.send(JSON.stringify listing)
+												pid_item = {}
+												pid_item.pids = []
+												pid_item.room_name = room_name
+												pid_item.pids.push listing.pid
+												pid_list.push pid_item
+												jsonfile.writeFileSync post_id_history, pid_list
+									.catch (err) ->
+										console.error(err)
 		, millisec
 	
 	#reset all items that were being monitored
 	robot.respond /reset search/i, (msg) ->	
 		options = jsonfile.readFileSync(config_path)
-		options.items = []
-		jsonfile.writeFileSync config_path, options
+		url = "https://" + process.env.HUBOT_FLOWDOCK_LOGIN_EMAIL + ":" + process.env.HUBOT_FLOWDOCK_LOGIN_PASSWORD + "@api.flowdock.com/flows/find?id=" + msg.message.user.room
+		robot.http(url)
+			.header('Accept', 'application/json')
+			.get() (err, res, body) ->
+				room_info = JSON.parse body
+				room_name = room_info.name
+				for item in options.items
+					if item.room_name == room_name
+						item.searchCriterias = []
+						jsonfile.writeFileSync config_path, options
+						break
+				pid_list = jsonfile.readFileSync(post_id_history)
+				for pid_list_item in pid_list
+					if pid_list_item.room_name == room_name
+						pid_list_item.pids = []
+						jsonfile.writeFileSync post_id_history, pid_list
+						break
 		
-addToSearchFile = (searchCriteria) ->
-	options = jsonfile.readFileSync(config_path)
-	options.items.push searchCriteria
-	jsonfile.writeFileSync config_path, options
+	addToSearchFile = (searchCriteria,msg) ->
+		url = "https://" + process.env.HUBOT_FLOWDOCK_LOGIN_EMAIL + ":" + process.env.HUBOT_FLOWDOCK_LOGIN_PASSWORD + "@api.flowdock.com/flows/find?id=" + msg.message.user.room
+		robot.http(url)
+			.header('Accept', 'application/json')
+			.get() (err, res, body) ->
+				room_info = JSON.parse body
+				room_name = room_info.name
+				options = jsonfile.readFileSync(config_path)
+				console.log options
+				search = {}
+				search.room_name = room_name
+				room_is_found = false
+				for item in options.items
+					if item.room_name == search.room_name
+						room_is_found = true
+						item.searchCriterias.push searchCriteria
+						break
+				if room_is_found == false
+					search.searchCriterias = []
+					search.searchCriterias.push searchCriteria
+					options.items.push search
+				jsonfile.writeFileSync config_path, options
