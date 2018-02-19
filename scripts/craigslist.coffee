@@ -83,7 +83,7 @@ module.exports = (robot) ->
 											for pid_list_item in pid_list
 												if pid_list_item.room_name == room_name
 													if listing.pid not in pid_list_item.pids
-														msg.send(JSON.stringify listing)
+														msg.reply("**Found new listing**, **title of listing**:  " + listing.title + ", **date**: " + listing.date.toString() + "\n**link**: " + listing.url + " \n**location**:" + listing.location + ",**price**:" + listing.price + ", **picture**:" + listing.hasPic)
 														pid_list_item.pids.push listing.pid
 														jsonfile.writeFileSync post_id_history, pid_list
 													room_is_in_pidlist = true
@@ -120,6 +120,7 @@ module.exports = (robot) ->
 						pid_list_item.pids = []
 						jsonfile.writeFileSync post_id_history, pid_list
 						break
+				msg.reply "search has been reseted to add to search please type 'craiglistbot add \"search text\" to search'"
 		
 	addToSearchFile = (searchCriteria,msg) ->
 		url = "https://" + process.env.HUBOT_FLOWDOCK_LOGIN_EMAIL + ":" + process.env.HUBOT_FLOWDOCK_LOGIN_PASSWORD + "@api.flowdock.com/flows/find?id=" + msg.message.user.room
@@ -143,3 +144,4 @@ module.exports = (robot) ->
 					search.searchCriterias.push searchCriteria
 					options.items.push search
 				jsonfile.writeFileSync config_path, options
+				
